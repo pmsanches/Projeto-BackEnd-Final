@@ -1,0 +1,40 @@
+{
+  "name": "projeto-backend-final",
+  "version": "1.0.0",
+  "description": "API RESTful de Finanças para Projeto Final da Disciplina de Desenvolvimento Web Backend, pela UTFPR.",
+  "keywords": [
+    "api",
+    "restful",
+    "backend",
+    "jwt",
+    "mysql"
+  ],
+  "homepage": "https://github.com/pmsanches/Projeto-BackEnd-Final#readme",
+  "bugs": {
+    "url": "https://github.com/pmsanches/Projeto-BackEnd-Final/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pmsanches/Projeto-BackEnd-Final.git"
+  },
+  "license": "MIT",
+  "author": "Paulo, Paolla e Illana",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "dotenv": "^18.0.10",
+    "express": "^5.3.0",
+    "express-jwt": "^8.5.1",
+    "jsonwebtoken": "^9.0.3",
+    "mysql2": "^3.24.6"
+  }
+}
