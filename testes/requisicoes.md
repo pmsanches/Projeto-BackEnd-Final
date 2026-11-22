@@ -4,14 +4,87 @@ Servidor rodando em `http://localhost:3000`.
 
 ## Preparação
 
-Enquanto o login não estiver pronto, gere um token de teste (id do usuário no final):
+Com o módulo de autenticação implementado, você pode obter o token real fazendo login:
+
+```bash
+# Faz login e extrai o token JWT (usando jq no Linux/Mac/Git Bash):
+TOKEN=$(curl -s -X POST http://localhost:3000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"email":"usuario.teste@email.com","senha":"SenhaSegura123"}' | jq -r .token)
+```
+
+Caso precise testar com script mock sem passar pelo login:
 
 ```bash
 TOKEN=$(node testes/gerarToken.js 1)
 ```
 
 > No PowerShell, use `$token = node testes/gerarToken.js 1`, troque `curl` por `curl.exe`
-> e escape as aspas do JSON: `-d '{\"nome\":\"Pets\",\"tipo\":\"saida\"}'`.
+> e escape as aspas do JSON: `-d "{\"nome\":\"Pets\",\"tipo\":\"saida\"}"`.
+
+---
+
+## Autenticação e Usuários
+
+### Cadastrar novo usuário (201)
+```bash
+curl -i -X POST http://localhost:3000/auth/cadastro \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nome": "Usuário Teste",
+    "email": "usuario.teste@email.com",
+    "cpf": "52998224725",
+    "senha": "SenhaSegura123"
+  }'
+```
+
+### Cadastrar com e-mail ou CPF duplicado (409)
+Repetir o comando anterior.
+
+### Cadastrar com dados inválidos (400)
+```bash
+curl -i -X POST http://localhost:3000/auth/cadastro \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nome": "Teste Falha",
+    "email": "email-invalido",
+    "cpf": "11111111111",
+    "senha": "123"
+  }'
+```
+
+### Login com sucesso (200)
+```bash
+curl -i -X POST http://localhost:3000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "usuario.teste@email.com",
+    "senha": "SenhaSegura123"
+  }'
+```
+
+### Login com credenciais inválidas (401)
+```bash
+curl -i -X POST http://localhost:3000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "usuario.teste@email.com",
+    "senha": "SenhaErrada999"
+  }'
+```
+
+### Consultar perfil do usuário autenticado (200)
+```bash
+curl -i http://localhost:3000/auth/me \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+### Consultar perfil sem token (401)
+```bash
+curl -i http://localhost:3000/auth/me
+```
+
+---
 
 ## Categorias
 
@@ -53,6 +126,8 @@ curl -i -X PUT http://localhost:3000/categorias/1 \
 ```bash
 curl -i -X DELETE http://localhost:3000/categorias/1 -H "Authorization: Bearer $TOKEN"
 ```
+
+---
 
 ## Fontes/destinos
 
@@ -105,6 +180,8 @@ curl -i -X PUT http://localhost:3000/fontes-destinos/2 \
 ```bash
 curl -i -X DELETE http://localhost:3000/fontes-destinos/2 -H "Authorization: Bearer $TOKEN"
 ```
+
+---
 
 ## Isolamento entre usuários (404)
 
