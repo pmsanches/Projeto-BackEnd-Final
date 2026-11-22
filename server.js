@@ -5,13 +5,14 @@ const pool = require('./database/connection');
 const protegerRota = require('./middleware/auth');
 const categoriasRoutes = require('./routes/categoriasRoutes');
 const fonteDestinoRoutes = require('./routes/fonteDestinoRoutes');
+const authRoutes = require('./routes/authRoutes');
 
 const app = express();
 app.use(express.json());
 
 app.use('/categorias', protegerRota, categoriasRoutes);
 app.use('/fontes-destinos', protegerRota, fonteDestinoRoutes);
-// app.use('/auth', authRoutes);
+app.use('/auth', authRoutes);
 // app.use('/lancamentos', protegerRota, lancamentosRoutes);
 // app.use('/relatorios', protegerRota, relatoriosRoutes);
 
