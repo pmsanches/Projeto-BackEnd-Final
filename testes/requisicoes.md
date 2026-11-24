@@ -183,11 +183,176 @@ curl -i -X DELETE http://localhost:3000/fontes-destinos/2 -H "Authorization: Bea
 
 ---
 
+## Lançamentos
+
+### Criar lançamento à vista / entrada (201)
+```bash
+curl -i -X POST http://localhost:3000/lancamentos \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tipo": "entrada",
+    "descricao": "Salário Mensal",
+    "valor": 5000.00,
+    "data": "2026-11-05",
+    "categoriaId": 1,
+    "fonteDestinoId": 1
+  }'
+```
+
+### Criar despesa à vista (201)
+```bash
+curl -i -X POST http://localhost:3000/lancamentos \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tipo": "saida",
+    "descricao": "Compras do Mês Supermercado",
+    "valor": 450.50,
+    "data": "2026-11-10",
+    "categoriaId": 3,
+    "fonteDestinoId": 1
+  }'
+```
+
+### Criar compra parcelada no cartão de crédito (201)
+```bash
+curl -i -X POST http://localhost:3000/lancamentos \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tipo": "saida",
+    "descricao": "Notebook Trabalho",
+    "valor": 3000.00,
+    "data": "2026-11-15",
+    "categoriaId": 7,
+    "fonteDestinoId": 2,
+    "parcelas": 10
+  }'
+```
+
+### Criar com dados inválidos (400)
+```bash
+curl -i -X POST http://localhost:3000/lancamentos \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tipo": "invalido",
+    "descricao": "",
+    "valor": -50,
+    "data": "15/11/2026",
+    "categoriaId": "abc"
+  }'
+```
+
+### Criar com incompatibilidade de tipo entre categoria e lançamento (400)
+> Tenta associar uma despesa (`saida`) com uma categoria de receita (`entrada`):
+```bash
+curl -i -X POST http://localhost:3000/lancamentos \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tipo": "saida",
+    "descricao": "Tentativa Incompatível",
+    "valor": 100.00,
+    "data": "2026-11-20",
+    "categoriaId": 1,
+    "fonteDestinoId": 1
+  }'
+```
+
+### Criar com categoria ou fonte inexistente / de outro usuário (404)
+```bash
+curl -i -X POST http://localhost:3000/lancamentos \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tipo": "saida",
+    "descricao": "Teste 404",
+    "valor": 100.00,
+    "data": "2026-11-20",
+    "categoriaId": 9999,
+    "fonteDestinoId": 1
+  }'
+```
+
+### Listar lançamentos do mês corrente com resumo (200)
+```bash
+curl -i http://localhost:3000/lancamentos \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+### Filtrar lançamentos por período (200)
+```bash
+curl -i "http://localhost:3000/lancamentos?inicio=2026-11-01&fim=2026-11-30" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+### Filtrar por tipo (200)
+```bash
+curl -i "http://localhost:3000/lancamentos?tipo=saida" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+### Filtrar por categoria, fonte/destino e paginação (200)
+```bash
+curl -i "http://localhost:3000/lancamentos?categoriaId=3&fonteDestinoId=1&pagina=1" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+### Consultar lançamento específico por ID (200)
+```bash
+curl -i http://localhost:3000/lancamentos/1 \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+### Atualizar lançamento (200)
+```bash
+curl -i -X PUT http://localhost:3000/lancamentos/1 \
+  -H "Authorization: Bearer $TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "tipo": "entrada",
+    "descricao": "Salário Mensal com Bônus",
+    "valor": 5500.00,
+    "data": "2026-11-05",
+    "categoriaId": 1,
+    "fonteDestinoId": 1
+  }'
+```
+
+### Excluir uma única parcela/lançamento (204)
+```bash
+curl -i -X DELETE http://localhost:3000/lancamentos/1 \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+### Excluir todas as parcelas de uma compra parcelada (204)
+```bash
+curl -i -X DELETE "http://localhost:3000/lancamentos/3?todasParcelas=true" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+---
+
 ## Isolamento entre usuários (404)
 
+### Tentar alterar categoria de outro usuário
 ```bash
 TOKEN2=$(node testes/gerarToken.js 2)
 curl -i -X PUT http://localhost:3000/categorias/1 \
   -H "Authorization: Bearer $TOKEN2" -H "Content-Type: application/json" \
   -d '{"nome":"Hack","tipo":"saida"}'
+```
+
+### Tentar consultar lançamento de outro usuário
+```bash
+curl -i http://localhost:3000/lancamentos/1 \
+  -H "Authorization: Bearer $TOKEN2"
+```
+
+### Tentar excluir lançamento de outro usuário
+```bash
+curl -i -X DELETE http://localhost:3000/lancamentos/1 \
+  -H "Authorization: Bearer $TOKEN2"
 ```
