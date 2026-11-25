@@ -273,6 +273,32 @@ curl -i "http://localhost:3100/relatorios/categorias?inicio=2026-11-01&fim=2026-
 
 ---
 
+### Previsão de faturas de cartão de crédito - Padrão 3 meses (RF9 - 200)
+```cmd
+curl -i "http://localhost:3100/relatorios/faturas" -H "Authorization: Bearer %TOKEN%"
+```
+
+### Previsão de faturas - Especificando quantidade de meses (ex: 6 meses) (200)
+```cmd
+curl -i "http://localhost:3100/relatorios/faturas?meses=6" -H "Authorization: Bearer %TOKEN%"
+```
+
+### Previsão de faturas - Parâmetro meses inválido (400)
+```cmd
+curl -i "http://localhost:3100/relatorios/faturas?meses=0" -H "Authorization: Bearer %TOKEN%"
+```
+
+```cmd
+curl -i "http://localhost:3100/relatorios/faturas?meses=15" -H "Authorization: Bearer %TOKEN%"
+```
+
+### Previsão de faturas sem autenticação (401)
+```cmd
+curl -i "http://localhost:3100/relatorios/faturas"
+```
+
+---
+
 ## Isolamento entre usuários (404)
 
 ### Tentar alterar categoria de outro usuário
