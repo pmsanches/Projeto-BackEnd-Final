@@ -92,4 +92,34 @@ router.get('/fontes-destinos', async (req, res) => {
   }
 });
 
+/**
+ * RF9: Previsão de faturas de cartão de crédito
+ * GET /relatorios/faturas?meses=3
+ */
+router.get('/faturas', async (req, res) => {
+  let { meses } = req.query;
+
+  if (meses !== undefined) {
+    const numMeses = Number(meses);
+    if (!Number.isInteger(numMeses) || numMeses < 1 || numMeses > 12) {
+      return res.status(400).json({
+        erro: 'Dados inválidos.',
+        campos: {
+          meses: 'O parâmetro meses deve ser um número inteiro entre 1 e 12.',
+        },
+      });
+    }
+  }
+
+  try {
+    const usuarioId = req.auth.id;
+    const resultado = await Relatorio.faturas(usuarioId, meses ? Number(meses) : 3);
+
+    return res.status(200).json(resultado);
+  } catch (erro) {
+    console.error('Erro ao gerar previsão de faturas:', erro);
+    return res.status(500).json({ erro: 'Erro interno ao gerar previsão de faturas.' });
+  }
+});
+
 module.exports = router;
