@@ -7,15 +7,16 @@ const categoriasRoutes      = require('./routes/categoriasRoutes');
 const fonteDestinoRoutes    = require('./routes/fonteDestinoRoutes');
 const authRoutes            = require('./routes/authRoutes');
 const lancamentosRoutes     = require('./routes/lancamentosRoutes');
+const relatoriosRoutes      = require('./routes/relatoriosRoutes');
 
 const app = express();
 app.use(express.json());
 
+app.use('/auth', authRoutes);
 app.use('/categorias', protegerRota, categoriasRoutes);
 app.use('/fontes-destinos', protegerRota, fonteDestinoRoutes);
-app.use('/auth', authRoutes);
 app.use('/lancamentos', protegerRota, lancamentosRoutes);
-// app.use('/relatorios', protegerRota, relatoriosRoutes);
+app.use('/relatorios', protegerRota, relatoriosRoutes);
 
 // Rota inexistente
 app.use((req, res) => {
@@ -34,7 +35,7 @@ app.use((err, req, res, next) => {
   res.status(500).json({ erro: 'Erro interno do servidor.' });
 });
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3100;
 app.listen(PORT, async () => {
   console.log(`Servidor rodando na porta ${PORT}`);
   try {
